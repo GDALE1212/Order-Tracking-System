@@ -96,7 +96,7 @@ def create_tables():
     # Check if a user exists, create one if not
     if not User.query.first():
         default_user = User(
-            username="admin", 
+            username="admin",
             password=bcrypt.generate_password_hash("password").decode('utf-8')
         )
         db.session.add(default_user)
@@ -118,7 +118,7 @@ def login():
         user = User.query.first()
 
         if user and bcrypt.check_password_hash(user.password, password) and user.username == username:
-            
+        
             return redirect(url_for('order_form'))  # Redirect to order form after login
         else:
             flash("Invalid username or password. Please try again.")
@@ -213,7 +213,7 @@ def comb_sort(orders, key_func, reverse=False):
         gap = int(gap / shrink_factor)
         if gap < 1:
             gap = 1
-        
+            
         swapped = False
         for i in range(len(orders) - gap):
             # Compare for ascending or descending order based on the reverse flag
@@ -238,7 +238,7 @@ def comb_sort(orders, key_func, reverse=False):
         gap = int(gap / shrink_factor)
         if gap < 1:
             gap = 1
-        
+
         swapped = False
         for i in range(len(orders) - gap):
             # Compare for ascending or descending order based on the reverse flag
@@ -253,15 +253,17 @@ def comb_sort(orders, key_func, reverse=False):
 @app.route('/order_management')
 def order_management():
     sort_by = request.args.get('sort_by', default='pickup_date', type=str)
-    
+   
     # Validate the 'sort_by' parameter to ensure it is valid
     valid_sort_fields = ['pickup_date', 'delicacy', 'status']
-    
+   
     if sort_by not in valid_sort_fields:
         return "Invalid sort option!", 400  # Return error if invalid option is passed
 
+
      # Fetch orders that are NOT removed (no actual deletion from the database)
     orders = Order.query.filter(Order.status != OrderStatus.REMOVED).all()
+
 
     # Sort based on the 'pickup_date'
     if sort_by == 'pickup_date':
@@ -290,7 +292,7 @@ def order_management():
 
         # Create a frequency rank for each delicacy (numeric representation of how many orders)
         frequency_ranks = {delicacy: count for delicacy, count in delicacy_counts.items()}
-        
+       
         # Apply Comb Sort to orders based on the frequency of the delicacy (higher frequencies first)
         orders = comb_sort(orders, lambda order: frequency_ranks[order.delicacy.name], reverse=True)
 
@@ -303,7 +305,7 @@ def order_management():
 @app.route('/remove_order/<int:order_id>', methods=['POST'])
 def remove_order(order_id):
     order = Order.query.get_or_404(order_id)
-    
+   
     # Mark the order as removed but don't delete it
     order.status = OrderStatus.REMOVED
     db.session.commit()
@@ -328,7 +330,7 @@ def update_order(orderId):
         order.container_size = data['container']
         order.special_request = data['special_request']
         order.status = data['status']
-        
+       
         # Commit changes to the database
         db.session.commit()
         return jsonify(success=True, order=data)

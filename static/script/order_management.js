@@ -10,7 +10,7 @@ function changeOrder(button) {
 function deleteOrder(button, orderId) {
     // Find the row that contains the delete button
     var row = button.closest('tr');
-    
+   
     // Optionally, add a confirmation step before deleting
     if (confirm("Are you sure you want to remove this order from the view?")) {
         // Temporarily remove the row from the table (without removing from the database)
@@ -18,7 +18,7 @@ function deleteOrder(button, orderId) {
 
         // Send an AJAX request to mark the order as removed in the database
         fetch(`/remove_order/${orderId}`, {
-            method: 'POST',
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -106,8 +106,8 @@ function cancelEdit(orderId) {
     document.getElementById("status_" + orderId).style.display = 'inline';
 
     // Hide Save and Cancel buttons, show Change button again
-    document.getElementById("save_" + orderId).style.display = 'none';
-    document.getElementById("cancel_" + orderId).style.display = 'none';
+    document.getElementById("save_button_" + orderId).style.display = 'none'; 
+    document.getElementById("cancel_button_" + orderId).style.display = 'none';  
     document.querySelector(`button[onclick="editOrder(${orderId})"]`).style.display = 'inline-block';
 }
 
@@ -127,7 +127,7 @@ function saveOrder(orderId) {
     };
 
     // Send updated data to the server
-    fetch(`/update_order/${orderId}`, {
+    fetch('/update_order/' + orderId, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -161,44 +161,44 @@ function deleteOrder(orderId) {
     }
 }
 
-function saveOrder(orderId) {
-    // Gather the updated data from the input fields
-    let formData = {
-        customer_name: document.getElementById("input_customer_name_" + orderId).value,
-        contact_number: document.getElementById("input_contact_number_" + orderId).value,
-        address: document.getElementById("input_address_" + orderId).value,
-        pickup_place: document.getElementById("input_pickup_place_" + orderId).value,
-        pickup_date: document.getElementById("input_pickup_date_" + orderId).value,
-        delicacy: document.getElementById("input_delicacy_" + orderId).value,
-        quantity: document.getElementById("input_quantity_" + orderId).value,
-        container: document.getElementById("input_container_" + orderId).value,
-        special_request: document.getElementById("input_special_request_" + orderId).value,
-        status: document.getElementById("input_status_" + orderId).value,
-    };
+// function saveOrder(orderId) {
+//     // Gather the updated data from the input fields
+//     let formData = {
+//         customer_name: document.getElementById("input_customer_name_" + orderId).value,
+//         contact_number: document.getElementById("input_contact_number_" + orderId).value,
+//         address: document.getElementById("input_address_" + orderId).value,
+//         pickup_place: document.getElementById("input_pickup_place_" + orderId).value,
+//         pickup_date: document.getElementById("input_pickup_date_" + orderId).value,
+//         delicacy: document.getElementById("input_delicacy_" + orderId).value,
+//         quantity: document.getElementById("input_quantity_" + orderId).value,
+//         container: document.getElementById("input_container_" + orderId).value,
+//         special_request: document.getElementById("input_special_request_" + orderId).value,
+//         status: document.getElementById("input_status_" + orderId).value,
+//     };
 
-    // Send the updated order data to the server using an AJAX POST request
-    fetch('/update_order/' + orderId, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // If successful, update the UI and hide input fields
-            updateUI(orderId, data.order);
-            alert('Order updated successfully!');
-        } else {
-            alert('Failed to update order.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while updating the order.');
-    });
-}
+//     // Send the updated order data to the server using an AJAX POST request
+//     fetch('/update_order/' + orderId, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify(formData)
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.success) {
+//             // If successful, update the UI and hide input fields
+//             updateUI(orderId, data.order);
+//             alert('Order updated successfully!');
+//         } else {
+//             alert('Failed to update order.');
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error:', error);
+//         alert('An error occurred while updating the order.');
+//     });
+// }
 
 function updateUI(orderId, updatedOrder) {
     // Update the displayed values with the new data
@@ -212,6 +212,7 @@ function updateUI(orderId, updatedOrder) {
     document.getElementById("container_" + orderId).innerText = updatedOrder.container;
     document.getElementById("special_request_" + orderId).innerText = updatedOrder.special_request;
     document.getElementById("status_" + orderId).innerText = updatedOrder.status;
+
 
     // Hide input fields and show the updated values
     document.getElementById("input_customer_name_" + orderId).style.display = 'none';
@@ -245,7 +246,9 @@ function updateUI(orderId, updatedOrder) {
     document.getElementById("status_" + orderId).style.display = 'inline';
 
     // Hide Save and Cancel buttons, show Change button
-    document.getElementById("save_" + orderId).style.display = 'none';
-    document.getElementById("cancel_" + orderId).style.display = 'none';
+    document.querySelector(`button[onclick="editOrder(${orderId})"]`).style.display = 'inline-block';
+
+    document.getElementById("save_button_" + orderId).style.display = 'none'; 
+    document.getElementById("cancel_button_" + orderId).style.display = 'none';  
     document.querySelector(`button[onclick="editOrder(${orderId})"]`).style.display = 'inline-block';
 }
