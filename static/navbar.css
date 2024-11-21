@@ -1,30 +1,28 @@
 /* navbar.css */
 
-/* Apply flexbox to the navigation container */
 nav {
     display: flex;
-    justify-content: space-between; /* Distribute items evenly */
-    align-items: center; /* Vertically centers the items */
+    justify-content: space-between; 
+    align-items: center;
     background-color: #333;
     padding: 10px 0;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     width: 100%;
 }
 
-/* Flexbox layout for the navigation links */
 .nav-links {
     display: flex;
-    justify-content: space-between; /* Evenly space out the links */
-    width: 80%; /* 80% of the space is for the first 3 links */
+    justify-content: space-between; 
+    width: 80%;
 }
 
 .nav-links a {
-    flex: 1; /* Make each link take equal space */
-    text-align: center; /* Center the text */
+    flex: 1; 
+    text-align: center; 
     color: white;
     text-decoration: none;
     padding: 10px 0;
-    box-sizing: border-box; /* Prevent padding from affecting the width */
+    box-sizing: border-box; 
     transition: background-color 0.3s ease;
 }
 
@@ -33,9 +31,8 @@ nav {
     border-radius: 5px;
 }
 
-/* Styling for the logout button */
 .logout {
-    flex: 1; /* Ensure the logout button takes the same width as others */
+    flex: 1; 
     background-color: #e74c3c;
     color: white;
     text-align: center;
@@ -48,14 +45,28 @@ nav {
     background-color: #c0392b;
 }
 
-/* Make sure the logout button is aligned to the right */
 nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 50px; /* Padding to add space around buttons */
+    padding: 10px 50px; 
 }
 
 .spacer {
     flex-grow: 1;
  }
+
+ 
+.icon-button.light-gray-background {
+    background-color:#e74d3c00; 
+    border: none;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.icon-button.light-gray-background:hover {
+    background-color: #FFFFFF; 
+}
+
+

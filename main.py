@@ -14,10 +14,9 @@ app = Flask(__name__)
 # Set configurations
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = os.urandom(24)  # Secure secret key for session management and flash messages
+app.secret_key = os.urandom(24)  
 
-app.permanent_session_lifetime = timedelta(minutes=30)  # Set session timeout to 30 minutes
-
+app.permanent_session_lifetime = timedelta(minutes=30)  
 
 # Initialize extensions
 db = SQLAlchemy(app)
@@ -49,10 +48,10 @@ class ContainerSize(PyEnum):
     SLICE = "SLICE"
 
 class OrderStatus(PyEnum):
-    PENDING = "Pending"
-    IN_PROGRESS = "In Progress"
-    COMPLETED = "Completed"
-    REMOVED = "Removed"
+    PENDING = "PENDING"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
+    REMOVED = "REMOVED"
 
 # User table definition
 class User(db.Model):
@@ -96,7 +95,7 @@ def create_tables():
     # Check if a user exists, create one if not
     if not User.query.first():
         default_user = User(
-            username="admin", 
+            username="admin",
             password=bcrypt.generate_password_hash("password").decode('utf-8')
         )
         db.session.add(default_user)
@@ -118,8 +117,8 @@ def login():
         user = User.query.first()
 
         if user and bcrypt.check_password_hash(user.password, password) and user.username == username:
-            
-            return redirect(url_for('order_form'))  # Redirect to order form after login
+        
+            return redirect(url_for('order_form'))  
         else:
             flash("Invalid username or password. Please try again.")
             return redirect(url_for('login'))
@@ -136,7 +135,7 @@ def order_form():
         pickup_place = request.form.get('pickupPlace')
         pickup_date = datetime.strptime(request.form.get('pickupDate'), "%Y-%m-%d")
         delicacy_display = request.form.get('delicacy')
-        quantity = int(request.form.get('quantity', 1))  # Default to 1 if missing
+        quantity = int(request.form.get('quantity', 1))  
         container_size = request.form.get('container')
         special_request = request.form.get('specialRequest', '')
 
@@ -176,7 +175,7 @@ def order_form():
 
         # Create and add new order directly to the database
         new_order = Order(
-            user_id=User.query.first().id,  # Assuming there's only one user, or use session-based user ID
+            user_id=User.query.first().id,  
             buyer_id=buyer.id,
             delicacy=delicacy_display,
             quantity=quantity,
@@ -198,7 +197,7 @@ def order_form():
             print(f"Error committing to the database: {e}")
             flash("Error submitting the order. Please try again.", 'error')
 
-        return redirect(url_for('order_form'))  # Optionally redirect to the order form or other page
+        return redirect(url_for('order_form'))  
 
     return render_template('order_form.html')
 
@@ -213,7 +212,7 @@ def comb_sort(orders, key_func, reverse=False):
         gap = int(gap / shrink_factor)
         if gap < 1:
             gap = 1
-        
+            
         swapped = False
         for i in range(len(orders) - gap):
             # Compare for ascending or descending order based on the reverse flag
@@ -238,7 +237,7 @@ def comb_sort(orders, key_func, reverse=False):
         gap = int(gap / shrink_factor)
         if gap < 1:
             gap = 1
-        
+
         swapped = False
         for i in range(len(orders) - gap):
             # Compare for ascending or descending order based on the reverse flag
@@ -253,15 +252,17 @@ def comb_sort(orders, key_func, reverse=False):
 @app.route('/order_management')
 def order_management():
     sort_by = request.args.get('sort_by', default='pickup_date', type=str)
-    
+   
     # Validate the 'sort_by' parameter to ensure it is valid
     valid_sort_fields = ['pickup_date', 'delicacy', 'status']
-    
+   
     if sort_by not in valid_sort_fields:
-        return "Invalid sort option!", 400  # Return error if invalid option is passed
+        return "Invalid sort option!", 400  
+
 
      # Fetch orders that are NOT removed (no actual deletion from the database)
     orders = Order.query.filter(Order.status != OrderStatus.REMOVED).all()
+
 
     # Sort based on the 'pickup_date'
     if sort_by == 'pickup_date':
@@ -290,7 +291,7 @@ def order_management():
 
         # Create a frequency rank for each delicacy (numeric representation of how many orders)
         frequency_ranks = {delicacy: count for delicacy, count in delicacy_counts.items()}
-        
+       
         # Apply Comb Sort to orders based on the frequency of the delicacy (higher frequencies first)
         orders = comb_sort(orders, lambda order: frequency_ranks[order.delicacy.name], reverse=True)
 
@@ -303,35 +304,47 @@ def order_management():
 @app.route('/remove_order/<int:order_id>', methods=['POST'])
 def remove_order(order_id):
     order = Order.query.get_or_404(order_id)
-    
+   
     # Mark the order as removed but don't delete it
     order.status = OrderStatus.REMOVED
     db.session.commit()
 
-    return jsonify({"success": True})  # Return success response for AJAX
+    return jsonify({"success": True}) 
 
-# Update an order (for the admin interface)
+
 @app.route('/update_order/<int:orderId>', methods=['POST'])
 def update_order(orderId):
     data = request.json  # Receive the JSON data
     order = Order.query.get(orderId)  # Get the order by ID
 
     if order:
-        # Update each field with the received data
-        order.buyer.name = data['customer_name']
-        order.buyer.contact_number = data['contact_number']
-        order.buyer.address = data['address']
-        order.pickup_place = data['pickup_place']
-        order.pickup_date = data['pickup_date']
-        order.delicacy = data['delicacy']
-        order.quantity = data['quantity']
-        order.container_size = data['container']
-        order.special_request = data['special_request']
-        order.status = data['status']
-        
-        # Commit changes to the database
-        db.session.commit()
-        return jsonify(success=True, order=data)
+        try:
+            # Convert the pickup_date string into a datetime.date object
+            pickup_date_str = data.get('pickup_date')
+            if pickup_date_str:
+                pickup_date = datetime.strptime(pickup_date_str, '%Y-%m-%d').date()  # Convert string to date object
+            else:
+                pickup_date = None  # Handle case if no pickup_date is provided
+
+            # Update each field with the received data
+            order.buyer.name = data.get('customer_name', order.buyer.name)
+            order.buyer.contact_number = data.get('contact_number', order.buyer.contact_number)
+            order.buyer.address = data.get('address', order.buyer.address)
+            order.pickup_place = data.get('pickup_place', order.pickup_place)
+            order.pickup_date = pickup_date 
+            order.delicacy = data.get('delicacy', order.delicacy)
+            order.quantity = data.get('quantity', order.quantity)
+            order.container_size = data.get('container', order.container_size)
+            order.special_request = data.get('special_request', order.special_request)
+            order.status = data.get('status', order.status)
+
+            # Commit changes to the database
+            db.session.commit()
+
+            return jsonify(success=True, order=data)
+        except Exception as e:
+            print(f"Error while updating order: {e}")
+            return jsonify(success=False, message="An error occurred while updating the order")
     else:
         return jsonify(success=False, message="Order not found")
 
@@ -339,14 +352,14 @@ def update_order(orderId):
 @app.route('/delete_order/<int:order_id>', methods=['DELETE'])
 def delete_order(order_id):
     order = Order.query.get_or_404(order_id)
-    db.session.delete(order)  # Permanently delete the order from the database
+    db.session.delete(order)  
     db.session.commit()
-    return '', 204  # No content, as the order is deleted
+    return '', 204 
 
 @app.route('/order_history')
 def order_history():
     # Fetch all orders, including those marked as removed
-    orders = Order.query.all()  # Get all orders, including removed ones
+    orders = Order.query.all() 
 
     # Debugging log to see the orders being fetched
     print(f"Orders fetched for history: {len(orders)} orders found.")

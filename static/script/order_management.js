@@ -1,16 +1,16 @@
 function changeOrder(button) {
     // Logic to change the order status
-    const row = button.parentElement.parentElement; // Get the row
-    const statusSelect = row.querySelector('select'); // Get the status dropdown
-    const selectedStatus = statusSelect.value; // Get the selected value
+    const row = button.parentElement.parentElement; 
+    const statusSelect = row.querySelector('select'); 
+    const selectedStatus = statusSelect.value; 
     alert('Order status changed to: ' + selectedStatus);
-    // Add your logic to update the order status in the database
+
 }
 
 function deleteOrder(button, orderId) {
     // Find the row that contains the delete button
     var row = button.closest('tr');
-    
+   
     // Optionally, add a confirmation step before deleting
     if (confirm("Are you sure you want to remove this order from the view?")) {
         // Temporarily remove the row from the table (without removing from the database)
@@ -18,7 +18,7 @@ function deleteOrder(button, orderId) {
 
         // Send an AJAX request to mark the order as removed in the database
         fetch(`/remove_order/${orderId}`, {
-            method: 'POST',
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -35,125 +35,13 @@ function deleteOrder(button, orderId) {
     }
 }
 
-function editOrder(orderId) {
-    // Show input fields and hide span text
-    document.getElementById("input_customer_name_" + orderId).style.display = 'block';
-    document.getElementById("customer_name_" + orderId).style.display = 'none';
-
-    document.getElementById("input_contact_number_" + orderId).style.display = 'block';
-    document.getElementById("contact_number_" + orderId).style.display = 'none';
-
-    document.getElementById("input_address_" + orderId).style.display = 'block';
-    document.getElementById("address_" + orderId).style.display = 'none';
-
-    document.getElementById("input_pickup_place_" + orderId).style.display = 'block';
-    document.getElementById("pickup_place_" + orderId).style.display = 'none';
-
-    document.getElementById("input_pickup_date_" + orderId).style.display = 'block';
-    document.getElementById("pickup_date_" + orderId).style.display = 'none';
-
-    document.getElementById("input_delicacy_" + orderId).style.display = 'block';
-    document.getElementById("delicacy_" + orderId).style.display = 'none';
-
-    document.getElementById("input_quantity_" + orderId).style.display = 'block';
-    document.getElementById("quantity_" + orderId).style.display = 'none';
-
-    document.getElementById("input_container_" + orderId).style.display = 'block';
-    document.getElementById("container_" + orderId).style.display = 'none';
-
-    document.getElementById("input_special_request_" + orderId).style.display = 'block';
-    document.getElementById("special_request_" + orderId).style.display = 'none';
-
-    document.getElementById("input_status_" + orderId).style.display = 'block';
-    document.getElementById("status_" + orderId).style.display = 'none';
-
-    // Show Save and Cancel buttons, hide Change button
-    document.getElementById("change_button_" + orderId).style.display = 'none';
-    document.getElementById("save_button_" + orderId).style.display = 'inline-block';
-    document.getElementById("cancel_button_" + orderId).style.display = 'inline-block';
-}
-
-function cancelEdit(orderId) {
-    // Revert back to displaying the span values and hide the input fields
-    document.getElementById("input_customer_name_" + orderId).style.display = 'none';
-    document.getElementById("customer_name_" + orderId).style.display = 'inline';
-
-    document.getElementById("input_contact_number_" + orderId).style.display = 'none';
-    document.getElementById("contact_number_" + orderId).style.display = 'inline';
-
-    document.getElementById("input_address_" + orderId).style.display = 'none';
-    document.getElementById("address_" + orderId).style.display = 'inline';
-
-    document.getElementById("input_pickup_place_" + orderId).style.display = 'none';
-    document.getElementById("pickup_place_" + orderId).style.display = 'inline';
-
-    document.getElementById("input_pickup_date_" + orderId).style.display = 'none';
-    document.getElementById("pickup_date_" + orderId).style.display = 'inline';
-
-    document.getElementById("input_delicacy_" + orderId).style.display = 'none';
-    document.getElementById("delicacy_" + orderId).style.display = 'inline';
-
-    document.getElementById("input_quantity_" + orderId).style.display = 'none';
-    document.getElementById("quantity_" + orderId).style.display = 'inline';
-
-    document.getElementById("input_container_" + orderId).style.display = 'none';
-    document.getElementById("container_" + orderId).style.display = 'inline';
-
-    document.getElementById("input_special_request_" + orderId).style.display = 'none';
-    document.getElementById("special_request_" + orderId).style.display = 'inline';
-
-    document.getElementById("input_status_" + orderId).style.display = 'none';
-    document.getElementById("status_" + orderId).style.display = 'inline';
-
-    // Hide Save and Cancel buttons, show Change button again
-    document.getElementById("save_" + orderId).style.display = 'none';
-    document.getElementById("cancel_" + orderId).style.display = 'none';
-    document.querySelector(`button[onclick="editOrder(${orderId})"]`).style.display = 'inline-block';
-}
-
-function saveOrder(orderId) {
-    // Gather the updated data
-    let formData = {
-        customer_name: document.getElementById("input_customer_name_" + orderId).value,
-        contact_number: document.getElementById("input_contact_number_" + orderId).value,
-        address: document.getElementById("input_address_" + orderId).value,
-        pickup_place: document.getElementById("input_pickup_place_" + orderId).value,
-        pickup_date: document.getElementById("input_pickup_date_" + orderId).value,
-        delicacy: document.getElementById("input_delicacy_" + orderId).value,
-        quantity: document.getElementById("input_quantity_" + orderId).value,
-        container: document.getElementById("input_container_" + orderId).value,
-        special_request: document.getElementById("input_special_request_" + orderId).value,
-        status: document.getElementById("input_status_" + orderId).value,
-    };
-
-    // Send updated data to the server
-    fetch(`/update_order/${orderId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Order updated successfully!');
-            updateUI(orderId, formData);  // Update the UI with new data
-        } else {
-            alert('Failed to update order.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while updating the order.');
-    });
-}
-
 function deleteOrder(orderId) {
     if (confirm('Are you sure you want to delete this order?')) {
         fetch('/delete_order/' + orderId, {
             method: 'DELETE'
         }).then(response => {
             if (response.ok) {
-                document.getElementById("order_" + orderId).remove(); // Remove the row from the table
+                document.getElementById("order_" + orderId).remove(); 
             } else {
                 alert('Failed to delete order.');
             }
@@ -161,35 +49,109 @@ function deleteOrder(orderId) {
     }
 }
 
-function saveOrder(orderId) {
-    // Gather the updated data from the input fields
+function showEditDialog(orderId) {
+    const row = document.getElementById(`order_${orderId}`);
+    
+    // Set hidden orderId value
+    document.getElementById("orderId").value = orderId;
+    
+    // Populate the text fields
+    document.getElementById("customerName").value = row.cells[0].innerText;
+    document.getElementById("contactNumber").value = row.cells[1].innerText;
+    document.getElementById("address").value = row.cells[2].innerText;
+    document.getElementById("pickupPlace").value = row.cells[3].innerText;
+    document.getElementById("pickupDate").value = row.cells[4].innerText;
+    document.getElementById("delicacy").value = row.cells[5].innerText;
+    document.getElementById("quantity").value = row.cells[6].innerText;
+    document.getElementById("container").value = row.cells[7].innerText;
+    document.getElementById("specialRequest").value = row.cells[8].innerText;
+
+    // Get the status value and log it for debugging
+    const status = row.cells[9].innerText.trim(); 
+    console.log('Retrieved status:', status); 
+    
+    // Extract the actual status (IN_PROGRESS) from the string "OrderStatus.IN_PROGRESS"
+    const statusValue = status.split('.')[1]; 
+    console.log('Extracted status value:', statusValue); 
+
+    // Get the status dropdown and log its options
+    const statusDropdown = document.getElementById("status");
+    Array.from(statusDropdown.options).forEach(option => {
+        console.log('Option value:', option.value); 
+    });
+
+    // Set the selected option based on the extracted status
+    Array.from(statusDropdown.options).forEach(option => {
+        if (option.value === statusValue) {
+            option.selected = true; 
+        }
+    });
+
+    // Attach the orderId to the save button
+    document.getElementById("saveButton").setAttribute("data-order-id", orderId);
+    
+    // Display the modal
+    document.getElementById("editModal").style.display = "block";
+    document.getElementById("modalOverlay").style.display = "block";
+}
+
+
+function saveOrder() {
+    const orderId = document.getElementById("orderId").value;
+    const row = document.getElementById(`order_${orderId}`);
+    row.cells[0].innerText = document.getElementById("customerName").value;
+    row.cells[1].innerText = document.getElementById("contactNumber").value;
+    row.cells[2].innerText = document.getElementById("address").value;
+    row.cells[3].innerText = document.getElementById("pickupPlace").value;
+    row.cells[4].innerText = document.getElementById("pickupDate").value;
+    row.cells[5].innerText = document.getElementById("delicacy").value;
+    row.cells[6].innerText = document.getElementById("quantity").value;
+    row.cells[7].innerText = document.getElementById("container").value;
+    row.cells[8].innerText = document.getElementById("specialRequest").value;
+    row.cells[9].innerText = document.getElementById("status").value;
+    closeModal();
+}
+
+function closeModal() {
+    document.getElementById("editModal").style.display = "none";
+    document.getElementById("modalOverlay").style.display = "none";
+}
+
+function saveOrder() {
+    const orderId = document.getElementById("saveButton").getAttribute("data-order-id");
+    console.log("Save button clicked! Order ID: " + orderId);
+
     let formData = {
-        customer_name: document.getElementById("input_customer_name_" + orderId).value,
-        contact_number: document.getElementById("input_contact_number_" + orderId).value,
-        address: document.getElementById("input_address_" + orderId).value,
-        pickup_place: document.getElementById("input_pickup_place_" + orderId).value,
-        pickup_date: document.getElementById("input_pickup_date_" + orderId).value,
-        delicacy: document.getElementById("input_delicacy_" + orderId).value,
-        quantity: document.getElementById("input_quantity_" + orderId).value,
-        container: document.getElementById("input_container_" + orderId).value,
-        special_request: document.getElementById("input_special_request_" + orderId).value,
-        status: document.getElementById("input_status_" + orderId).value,
+        customer_name: document.getElementById("customerName").value,
+        contact_number: document.getElementById("contactNumber").value,
+        address: document.getElementById("address").value,
+        pickup_place: document.getElementById("pickupPlace").value,
+        pickup_date: document.getElementById("pickupDate").value,
+        delicacy: document.getElementById("delicacy").value,
+        quantity: document.getElementById("quantity").value,
+        container: document.getElementById("container").value,
+        special_request: document.getElementById("specialRequest").value,
+        status: document.getElementById("status").value,
     };
 
-    // Send the updated order data to the server using an AJAX POST request
+    console.log('Form data being sent:', JSON.stringify(formData));
+
     fetch('/update_order/' + orderId, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
     })
-    .then(response => response.json())
+    
+    .then(response => {
+        console.log('Response:', response);
+        return response.json();
+    })
     .then(data => {
+        console.log('Data received from server:', data);
         if (data.success) {
-            // If successful, update the UI and hide input fields
-            updateUI(orderId, data.order);
-            alert('Order updated successfully!');
+            closeModal()
+            handleSortChange()
+        
         } else {
             alert('Failed to update order.');
         }
@@ -201,51 +163,93 @@ function saveOrder(orderId) {
 }
 
 function updateUI(orderId, updatedOrder) {
-    // Update the displayed values with the new data
-    document.getElementById("customer_name_" + orderId).innerText = updatedOrder.customer_name;
-    document.getElementById("contact_number_" + orderId).innerText = updatedOrder.contact_number;
-    document.getElementById("address_" + orderId).innerText = updatedOrder.address;
-    document.getElementById("pickup_place_" + orderId).innerText = updatedOrder.pickup_place;
-    document.getElementById("pickup_date_" + orderId).innerText = updatedOrder.pickup_date;
-    document.getElementById("delicacy_" + orderId).innerText = updatedOrder.delicacy;
-    document.getElementById("quantity_" + orderId).innerText = updatedOrder.quantity;
-    document.getElementById("container_" + orderId).innerText = updatedOrder.container;
-    document.getElementById("special_request_" + orderId).innerText = updatedOrder.special_request;
-    document.getElementById("status_" + orderId).innerText = updatedOrder.status;
+    console.log(updatedOrder); 
+    const updateTextContent = (elementId, newText) => {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.innerText = newText;
+        } else {
+            console.warn(`Element with ID ${elementId} not found`);
+        }
+    };
 
-    // Hide input fields and show the updated values
-    document.getElementById("input_customer_name_" + orderId).style.display = 'none';
-    document.getElementById("customer_name_" + orderId).style.display = 'inline';
-
-    document.getElementById("input_contact_number_" + orderId).style.display = 'none';
-    document.getElementById("contact_number_" + orderId).style.display = 'inline';
-
-    document.getElementById("input_address_" + orderId).style.display = 'none';
-    document.getElementById("address_" + orderId).style.display = 'inline';
-
-    document.getElementById("input_pickup_place_" + orderId).style.display = 'none';
-    document.getElementById("pickup_place_" + orderId).style.display = 'inline';
-
-    document.getElementById("input_pickup_date_" + orderId).style.display = 'none';
-    document.getElementById("pickup_date_" + orderId).style.display = 'inline';
-
-    document.getElementById("input_delicacy_" + orderId).style.display = 'none';
-    document.getElementById("delicacy_" + orderId).style.display = 'inline';
-
-    document.getElementById("input_quantity_" + orderId).style.display = 'none';
-    document.getElementById("quantity_" + orderId).style.display = 'inline';
-
-    document.getElementById("input_container_" + orderId).style.display = 'none';
-    document.getElementById("container_" + orderId).style.display = 'inline';
-
-    document.getElementById("input_special_request_" + orderId).style.display = 'none';
-    document.getElementById("special_request_" + orderId).style.display = 'inline';
-
-    document.getElementById("input_status_" + orderId).style.display = 'none';
-    document.getElementById("status_" + orderId).style.display = 'inline';
-
-    // Hide Save and Cancel buttons, show Change button
-    document.getElementById("save_" + orderId).style.display = 'none';
-    document.getElementById("cancel_" + orderId).style.display = 'none';
-    document.querySelector(`button[onclick="editOrder(${orderId})"]`).style.display = 'inline-block';
+    updateTextContent("customer_name_" + orderId, updatedOrder.customer_name);
+    updateTextContent("contact_number_" + orderId, updatedOrder.contact_number);
+    updateTextContent("address_" + orderId, updatedOrder.address);
+    updateTextContent("pickup_place_" + orderId, updatedOrder.pickup_place);
+    updateTextContent("pickup_date_" + orderId, updatedOrder.pickup_date);
+    updateTextContent("delicacy_" + orderId, updatedOrder.delicacy);
+    updateTextContent("quantity_" + orderId, updatedOrder.quantity);
+    updateTextContent("container_" + orderId, updatedOrder.container);
+    updateTextContent("special_request_" + orderId, updatedOrder.special_request);
+    updateTextContent("status_" + orderId, updatedOrder.status);
 }
+
+
+function createOrder() {
+    const customerName = document.getElementById('customerName').value;
+    const contactNumber = document.getElementById('contactNumber').value;
+    const address = document.getElementById('address').value;
+    const pickupPlace = document.getElementById('pickupPlace').value;
+    const pickupDate = document.getElementById('pickupDate').value;
+    const delicacy = document.getElementById('delicacy').value;
+    const quantity = document.getElementById('quantity').value;
+    const container = document.getElementById('container').value;
+    const specialRequest = document.getElementById('specialRequest').value;
+
+    // Sending data to backend using fetch (example)
+    fetch('/create_order', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            customer_name: customerName,
+            contact_number: contactNumber,
+            address: address,
+            pickup_place: pickupPlace,
+            pickup_date: pickupDate,
+            delicacy: delicacy,
+            quantity: quantity,
+            container: container,
+            special_request: specialRequest
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Order created successfully');
+            closeModal();  
+        } else {
+            alert('Error creating order');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while creating the order.');
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Define the mapping of statuses to their user-friendly names
+    const statusMap = {
+        "OrderStatus.PENDING": "Pending",
+        "OrderStatus.IN_PROGRESS": "In Progress",
+        "OrderStatus.COMPLETED": "Completed",
+        "OrderStatus.REMOVED": "Removed",
+    };
+
+    // Select all rows in the table body
+    const rows = document.querySelectorAll("#ordersTable tbody tr");
+
+    // Loop through each row to update the status text
+    rows.forEach(row => {
+        const statusCell = row.cells[9]; 
+        const currentStatus = statusCell.innerText.trim();
+
+        // Replace the status if it exists in the mapping
+        if (statusMap[currentStatus]) {
+            statusCell.innerText = statusMap[currentStatus];
+        }
+    });
+});

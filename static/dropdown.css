@@ -1,0 +1,52 @@
+.sorting-dropdown {
+    margin: 10px 0;
+    position: relative; 
+    display: inline-block; 
+}
+
+#sort-options {
+    appearance: none; 
+    -webkit-appearance: none; 
+    -moz-appearance: none; 
+    border: 1px solid #ccc; 
+    border-radius: 8px; 
+    background-color: #ffffff; 
+    padding: 10px 12px;
+    font-size: 16px; /* Text size */
+    color: #333; /* Text color */
+    cursor: pointer; 
+    width: 200px; /* Dropdown width */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); 
+    outline: none;
+    position: relative;
+}
+
+#sort-options option:hover {
+    background-color: orange; /* Orange background on hover */
+    color: white;
+}
+
+.sort-options:hover {
+    border-color: #888; 
+}
+
+#sort-options option:hover {
+    background-color: orange; 
+    color: white; 
+}
+
+#sort-options:focus {
+    border-color: #555; 
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); 
+}
+
+.sorting-dropdown::after {
+    content: "▼"; /* Spinner-like arrow */
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%); 
+    pointer-events: none; /* Prevents interaction with the arrow */
+    color: #333; 
+    font-size: 12px; 
+}
