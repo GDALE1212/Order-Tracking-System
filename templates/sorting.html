@@ -1,0 +1,34 @@
+<div class="sorting-dropdown">
+    <select id="sort-options" onchange="handleSortChange()">
+        <option value="" disabled>Sort by</option>
+        <option value="pickup_date">Pickup Date</option>
+        <option value="delicacy">Delicacy</option>
+        <option value="status">Status</option>
+    </select>
+</div>
+
+<script>
+    function handleSortChange() {
+        const selectedOption = document.getElementById('sort-options').value;
+        if (selectedOption) {
+            const baseUrl = "{{ url_for('order_management') }}";
+            window.location.href = `${baseUrl}?sort_by=${selectedOption}`;
+        }
+    }
+
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const sortBy = urlParams.get('sort_by');
+        
+        if (sortBy) {
+            const selectElement = document.getElementById('sort-options');
+            const options = selectElement.options;
+            for (let i = 0; i < options.length; i++) {
+                if (options[i].value === sortBy) {
+                    options[i].selected = true;
+                    break;
+                }
+            }
+        }
+    };
+</script>
